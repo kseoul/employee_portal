@@ -1,4 +1,4 @@
-# Django Employee Portal
+# Employee Portal
 This is a Simple Employee Portal System Developed using Python (Django).
 Feel free to make changes based on your requirements.
 
