@@ -2,9 +2,9 @@
 This is a Simple Employee Portal System Developed using Python (Django).
 Feel free to make changes based on your requirements.
 
-[Project Demo on YouTube](https://www.youtube.com/watch?v=kArCR96m7uo "Django Student Management System Demo")
+Inspired by [Project Demo on YouTube](https://www.youtube.com/watch?v=kArCR96m7uo "Django Student Management System Demo")
 
-I've created this project while learning Django and followed tutorial series from **SuperCoders**
+I've created this project after learning Django by following tutorial series from **SuperCoders**
 
 ## Features of this Project
 
