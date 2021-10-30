@@ -1,0 +1,209 @@
+{% extends 'employee_template/base_template.html' %}
+
+{% block page_title %}
+    Leave Report and Apply for Leave
+{% endblock page_title %}
+
+{% block main_content %}
+
+{% load static %}
+
+<section class="content">
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- general form elements -->
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Apply For Leave</h3>
+                        </div>
+                        <!-- /.card-header -->
+                        {% comment %} Display Messages {% endcomment %}
+                        {% if messages %}
+                        <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                {% if message.tags == "error" %}
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                {% elif message.tags == "success" %}
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                            
+                        <form id = "leave_form" method="POST" action="{% url 'employee_apply_leave_save' %}">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="request_type">Request Type</label>
+                                </br>
+                                <select id="request_type" name="request_type" onchange="showDiv(this)">
+                                    <option disabled selected value> -- select an option -- </option>
+                                    <option value="1">Half day</option>
+                                    <option value="2">One day</option>
+                                    <option value="3">Range of Days</option>              
+                                </select>                  
+                            
+                            </div>
+                            
+                            <div id="date_range" class="form-row" style="display: none">
+                                <div class="col">
+                                    <label>Start Date </label>
+                                    <input type="date" id="start_date" name="start_date" class="form-control" onchange="calculateIt()"/>
+                                </div>
+                                <div class="col">
+                                    <label>End Date </label>
+                                    <input type="date" id="end_date" name="end_date" class="form-control" onchange="calculateIt()"/>
+                                </div>
+                            </div>
+
+
+                            <div id="single_date" class="form-group" style="display: none">
+                                <label>Leave Date </label>
+                                <input id="leave_date" type="date" name="leave_date" class="form-control" />
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col">
+                                <label>Total Hours Requested </label>
+                                <input id="total_hours" type="number" name="total_hours" class="form-control" min="0"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Leave Reason </label>
+                                <textarea name="leave_message" class="form-control" rows="6" placeholder="Leave Message"></textarea>
+                            </div>
+
+
+                        </div>
+                        <!-- /.card-body -->
+
+                        <div class="card-footer">
+                        <button id="submitButton" type="submit" class="btn btn-primary" style="display: none">Apply for Leave</button>
+                        </div>
+
+                    </form>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Leave Apply History</h3>
+                        </div>
+
+                        <div class="card-body">
+                           <div class="table-responsive">
+                                <table class="table">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Total Hours</th>
+                                        <th>Leave Message</th>
+                                        <th>Status</th>
+                                        <th>Supervisor</th>
+                                    </tr>
+                                    </thead>
+                                    
+                                    {% for leave in leave_data %}
+                                    <tr>
+                                        <td>{{ leave.start_date }}</td>
+                                        <td>{{ leave.end_date }}</td>
+                                        <td>{{ leave.hours_calc }}</td>
+                                        <td>{{ leave.leave_message }}</td>
+                                        <td>
+                                            {% if leave.leave_status == 1 %}
+                                                <span class="text-success">Approved</span>
+                                            {% elif leave.leave_status == 2 %}
+                                                <span class="text-danger">Rejected</span>
+                                            {% else %}
+                                                <span class="text-warning">Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ leave.leaveapprovalemployees.supervisor_id.admin.first_name}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /.container-fluid -->
+    </section>
+  {% endblock main_content %}
+
+{% block custom_js %}
+<script>
+function showDiv(select){
+    if(select.value==3){
+        document.getElementById('date_range').style.display = "block";
+        document.getElementById('single_date').style.display = "none";
+        document.getElementById('submitButton').style.display = "block";
+        document.getElementById("leave_date").value = '';
+        document.getElementById('total_hours').value = '';
+
+    }else if (select.value==1) {
+        document.getElementById('date_range').style.display = "none";
+        document.getElementById('single_date').style.display = "block";
+        document.getElementById('submitButton').style.display = "block";
+        document.getElementById('start_date').value = '';
+        document.getElementById('end_date').value = '';
+        document.getElementById('total_hours').value = 4;
+    }
+    else{
+        document.getElementById('date_range').style.display = "none";
+        document.getElementById('single_date').style.display = "block";
+        document.getElementById('submitButton').style.display = "block";
+        document.getElementById('start_date').value = '';
+        document.getElementById('end_date').value = '';
+        document.getElementById('total_hours').value = 8;
+    }
+} 
+function calculateHrs() {
+
+    let startdt = new Date(document.getElementById("start_date").value);
+    let enddt = new Date(document.getElementById("end_date").value);  
+    return (getBusinessDatesCount(startdt, enddt)*8);
+    //return (parseInt((enddt -startdt) / (24*3600*1000)) * 8) + 8;
+}
+function calculateIt(){
+    if(document.getElementById("start_date")){
+        document.getElementById("total_hours").value = calculateHrs();
+    }
+}
+
+function getBusinessDatesCount(startDate, endDate) {
+    let count = 0;
+    const curDate = new Date(startDate.getTime());
+    while (curDate <= endDate) {
+        const dayOfWeek = curDate.getDay();
+        if(dayOfWeek !== 0 && dayOfWeek !== 6) count++;
+        if(dayOfWeek == 1) count++;
+        if(dayOfWeek == 5) count--;
+        curDate.setDate(curDate.getDate() + 1);
+    }
+    return count;
+}
+</script>
+{% endblock custom_js %}
