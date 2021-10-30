@@ -4,7 +4,7 @@ Feel free to make changes based on your requirements.
 
 Inspired by [Project Demo on YouTube](https://www.youtube.com/watch?v=kArCR96m7uo "Django Student Management System Demo")
 
-I've created this project after learning Django by following tutorial series from **SuperCoders**
+I've created this project after learning from tutorials by **SuperCoders**
 
 ## Features of this Project
 
